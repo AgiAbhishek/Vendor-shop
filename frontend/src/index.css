@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ----------- Global Look ----------- */
+:root {
+  --ring: 0 0% 0%;
+}
+
+body { @apply text-gray-800 antialiased; }
+
+/* Header nav active style */
+.nav-pill { @apply inline-flex items-center rounded-xl px-3 py-2 border border-transparent hover:border-black/20 transition; }
+.nav-pill-active { @apply border-black bg-black text-white; }
+
+/* Card styles */
+.card { @apply bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg p-6 border border-black/5; }
+.card-ghost { @apply bg-white/60 backdrop-blur-md rounded-2xl shadow p-6 border border-black/5; }
+
+/* Buttons */
+.btn { @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium border border-black/10 hover:border-black/40 transition; }
+.btn-primary { @apply bg-black text-white border-black hover:opacity-90 shadow-sm; }
+.btn-soft { @apply bg-gray-100 hover:bg-gray-200; }
+
+/* Inputs */
+.input { @apply w-full rounded-xl border border-gray-300 bg-white/90 px-3 py-2 outline-none focus:ring-2 focus:ring-black/20 focus:border-black/40 transition; }
+.label { @apply text-sm font-semibold mb-1; }
+.help { @apply text-xs text-gray-500; }
+
+/* Auth background */
+.auth-bg {
+  background:
+    radial-gradient(60rem 30rem at 20% -10%, rgba(0,0,0,0.10), transparent 50%),
+    radial-gradient(50rem 30rem at 120% 10%, rgba(0,0,0,0.06), transparent 40%),
+    linear-gradient(180deg, #fafaf9, #f3f4f6);
+}
+
+/* Simple fade/slide */
+@keyframes floatIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: floatIn .4s ease both; }
