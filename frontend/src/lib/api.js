@@ -1,8 +1,6 @@
 import axios from 'axios'
 
-// On Vercel (production), VITE_API_BASE is empty -> relative to same origin
-// In local dev, set VITE_API_BASE=http://127.0.0.1:8000 in .env.local
-const API_BASE = (import.meta.env.VITE_API_BASE ?? '')
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000'
 
 const api = axios.create({ baseURL: API_BASE })
 
@@ -15,6 +13,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (r) => r,
   (err) => {
+    // bubble a clearer error
     err.message = err?.response?.data?.detail || err.message || 'Request failed'
     return Promise.reject(err)
   }
@@ -49,9 +48,15 @@ export async function nearby(lat, lng, radius = 5) {
   return data
 }
 
+// Simple geocode via Nominatim (OpenStreetMap)
 export async function geocodeCity(city) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`
-  const res = await fetch(url, { headers: { 'Accept-Language': 'en' } })
+  const res = await fetch(url, {
+    headers: {
+      // Browsers ignore custom UA, but keep it polite
+      'Accept-Language': 'en',
+    },
+  })
   const data = await res.json()
   if (!Array.isArray(data) || data.length === 0) throw new Error('City not found')
   const first = data[0]
