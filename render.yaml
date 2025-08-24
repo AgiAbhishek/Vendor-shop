@@ -1,0 +1,59 @@
+# render.yaml  — deploys Django API + Vite frontend
+services:
+  # ------------------ BACKEND (Django) ------------------
+  - type: web
+    name: vendor-shop-api
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: |
+      python manage.py migrate && \
+      gunicorn project.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      # Python version: Render reads runtime.txt in /backend, but this is okay as a fallback
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # Security / settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      # CORS/CSRF: the frontend URL is injected below after the static site is created
+      - key: CORS_ALLOWED_ORIGINS
+        fromService:
+          name: vendor-shop-frontend
+          type: static
+          property: url
+      - key: CSRF_TRUSTED_ORIGINS
+        fromService:
+          name: vendor-shop-frontend
+          type: static
+          property: url
+      # MongoDB Atlas
+      - key: MONGODB_URI
+        value: "mongodb+srv://rrrahulraj4839:canwZkG3qTH5zaxk@cluster1.d2ejgkh.mongodb.net/Vendor-Shop?retryWrites=true&w=majority&appName=Cluster1"
+      # JWT lifetimes (optional)
+      - key: JWT_ACCESS_LIFETIME_MIN
+        value: "10"
+      - key: JWT_REFRESH_LIFETIME_DAYS
+        value: "7"
+
+  # ------------------ FRONTEND (Vite) -------------------
+  - type: static
+    name: vendor-shop-frontend
+    plan: free
+    buildCommand: |
+      cd frontend && npm ci && npm run build
+    publishPath: frontend/dist
+    envVars:
+      - key: VITE_API_BASE
+        fromService:
+          name: vendor-shop-api
+          type: web
+          property: url
