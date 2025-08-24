@@ -7,3 +7,4 @@ django-ratelimit>=4.1
 mongoengine==0.29.1
 dnspython>=2.6
 serverless-wsgi>=3.0.3
+vercel-wsgi==0.8.2
